@@ -1,25 +1,49 @@
-name: Deploy Portfolio to AWS
+name: Build and Deploy Vite Portfolio
 
-# 1. When should this pipeline run?
 on:
   push:
     branches:
-      - main # Whenever you push code to the 'main' branch
+      - main 
 
-# 2. What should the pipeline do?
 jobs:
-  deploy:
-    runs-on: ubuntu-latest # GitHub provides a temporary Linux runner to execute this
+  build-and-deploy:
+    runs-on: ubuntu-latest 
 
     steps:
-      - name: SSH into EC2 and Pull fresh code
+      # 1. Download your code onto the GitHub runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Install Node.js on the GitHub runner
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. Install packages and compile the Vite app
+      - name: Install and Build
+        run: |
+          npm install
+          npm run build
+
+      # 4. Securely copy the compiled 'dist' folder to your EC2 server
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist"
+          target: "/home/ec2-user/"
+
+      # 5. Move the compiled files into the Nginx web folder
+      - name: Move to Nginx and Clean Up
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            sudo git config --global --add safe.directory /usr/share/nginx/html
-            cd /usr/share/nginx/html
-            sudo git pull origin main
-
+            sudo rm -rf /usr/share/nginx/html/*
+            sudo cp -r /home/ec2-user/dist/* /usr/share/nginx/html/
+            rm -rf /home/ec2-user/dist
