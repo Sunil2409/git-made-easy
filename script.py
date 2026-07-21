@@ -1,1 +1,0 @@
-print("This is my first github learning script file")

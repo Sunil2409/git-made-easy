@@ -1,6 +1,41 @@
-terraform
-portfolio-ec2
-portfolio_key
+# ── Terraform ──
+.terraform/
 *.tfstate
 *.tfstate.backup
-Github.code-workspace
+*.tfplan
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ── SSH Keys & Secrets ──
+portfolio_key
+portfolio_key.pub
+*.pem
+*.key
+.env
+.env.*
+
+# ── IDE & Editor ──
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+*~
+
+# ── OS Files ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ──
+*.log
+npm-debug.log*
+
+# ── Legacy directories (local Terraform workspaces) ──
+portfolio-ec2/
+terraform/
