@@ -1,0 +1,25 @@
+name: Deploy Portfolio to AWS
+
+# 1. When should this pipeline run?
+on:
+  push:
+    branches:
+      - main # Whenever you push code to the 'main' branch
+
+# 2. What should the pipeline do?
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # GitHub provides a temporary Linux runner to execute this
+
+    steps:
+      - name: SSH into EC2 and Pull fresh code
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo git config --global --add safe.directory /usr/share/nginx/html
+            cd /usr/share/nginx/html
+            sudo git pull origin main
+

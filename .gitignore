@@ -1,2 +1,5 @@
 terraform
 portfolio-ec2
+portfolio_key
+*.tfstate
+*.tfstate.backup
